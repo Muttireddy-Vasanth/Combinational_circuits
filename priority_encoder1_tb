@@ -1,0 +1,52 @@
+// Author: Vasanth, 2022
+module priority_encoder1_tb();
+  // Global variables required for testbench
+  reg I0, I1, I2, I3, I4, I5, I6, I7;
+  wire B0, B1, B2, idle;
+
+  // Instantiate the design under test
+  priority_encoder1 DUT(I0, I1, I2, I3, I4, I5, I6, I7, B0, B1, B2, idle);
+
+  // Task to initialize inputs of DUT to 0
+  task initialise;
+    begin
+      {I7, I6, I5, I4, I3, I2, I1, I0} = 8'b00000000;
+      #10;
+    end
+  endtask
+
+  // Task with arguments for driving stimulus to DUT
+  task stimulus(input [7:0] i);
+    begin
+      {I7, I6, I5, I4, I3, I2, I1, I0} = i;
+      #20;
+    end
+  endtask
+
+  // Call the tasks in initial block for stimulus sequence
+  initial begin
+    initialise;
+    stimulus(0);
+    stimulus(1);
+    stimulus(3);
+    stimulus(5);
+    stimulus(15);
+    stimulus(31);
+    stimulus(63);
+    stimulus(128);
+    stimulus(255);
+  end
+
+  // Monitor inputs and outputs
+  initial begin
+    $monitor("Values of input=%b%b%b%b%b%b%b%b\n Output binary=%b %b %b, Idle = %b",
+             I7, I6, I5, I4, I3, I2, I1, I0, B2, B1, B0, idle);
+  end
+
+  // Finish simulation after 200 ns
+  initial begin
+    #200;
+    $finish;
+  end
+
+endmodule
